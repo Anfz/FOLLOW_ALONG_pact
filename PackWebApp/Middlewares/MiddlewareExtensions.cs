@@ -8,7 +8,7 @@ namespace PackWebApp.Middlewares
 {
     public static class MiddlewareExtensions
     {
-        public static IApplicationBuilder UseCustomMiddleWare(this IApplicationBuilder builder)
+        public static IApplicationBuilder UseCustomMiddleware(this IApplicationBuilder builder)
         {
             return builder.UseMiddleware<CustomMiddleware>();
         }
