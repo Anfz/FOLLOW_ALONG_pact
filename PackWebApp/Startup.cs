@@ -13,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using PackWebApp.Entities;
 using PackWebApp.Middlewares;
+using PackWebApp.Repositories;
 
 namespace PackWebApp
 {
@@ -30,7 +31,7 @@ namespace PackWebApp
         public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
+                .SetBasePath(env.ContentRootPath)
                 .AddJsonFile("appsettings.json");
             Configuration = builder.Build(); 
 
@@ -45,6 +46,8 @@ namespace PackWebApp
 
             services.AddDbContext<PackDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            //because we only need one
+            services.AddScoped<ICustomerRepository, CustomerRepository>();
 
             services.Configure<MyConfiguration>(Configuration);
 

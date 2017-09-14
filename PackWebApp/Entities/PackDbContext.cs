@@ -12,5 +12,7 @@ namespace PackWebApp.Entities
         {
             
         }
+
+        public DbSet<Customer> Customers { get; set; }
     }
 }
