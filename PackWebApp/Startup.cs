@@ -82,6 +82,7 @@ namespace PackWebApp
             {
                 mapper.CreateMap<Customer, CustomerDto>().ReverseMap();
                 mapper.CreateMap<Customer, CustomerCreateDto>().ReverseMap();
+                mapper.CreateMap<Customer, CustomerUpdateDto>().ReverseMap();
             });
 
             app.UseCustomMiddleware();

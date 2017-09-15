@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PackWebApp.Dtos;
@@ -32,7 +33,7 @@ namespace PackWebApp.Controllers
         }
 
         [HttpGet]
-        [Route("{id}")]
+        [Route("{id}", Name="getSingleCustomer")]
         public IActionResult GetSingleCustomer(Guid id)
         {
             Customer customerFromRepo = _customerRepository.GetSingle(id);
@@ -47,7 +48,7 @@ namespace PackWebApp.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddCustomer(CustomerCreateDto customerCreateDto)
+        public IActionResult AddCustomer([FromBody]CustomerCreateDto customerCreateDto)
         {
             Customer toAdd = Mapper.Map<Customer>(customerCreateDto);
 
@@ -60,8 +61,69 @@ namespace PackWebApp.Controllers
                 return new StatusCodeResult(500);
             }
 
-            return Ok(Mapper.Map<CustomerDto>(toAdd));
+            return CreatedAtRoute("GetSingleCustomer", 
+                                  new {id = toAdd.Id }, 
+                                  Mapper.Map<CustomerDto>(toAdd));
         }
+
+        [HttpPut]
+        [Route("{id}")]
+        public IActionResult UpdateCustomer(Guid id, [FromBody] CustomerUpdateDto customerUpdateDto)
+        {
+            var existingCustomer = _customerRepository.GetSingle(id);
+            if (existingCustomer == null)
+            {
+                return NotFound();
+            }
+
+            Mapper.Map(customerUpdateDto, existingCustomer);
+
+            _customerRepository.Update(existingCustomer);
+
+            bool result = _customerRepository.Save();
+
+            if (!result)
+            {
+                return new StatusCodeResult(500);
+            }
+
+            return Ok(Mapper.Map<CustomerDto>(existingCustomer));
+
+        }
+
+        [HttpPatch]
+        [Route("{id}")]
+        public IActionResult PartiallyUpdate(Guid id, [FromBody]JsonPatchDocument<CustomerUpdateDto> customerPatchDoc)
+        {
+            if (customerPatchDoc == null)
+            {
+                return BadRequest(); 
+            }
+
+            var existingCustomer = _customerRepository.GetSingle(id);
+
+            if (existingCustomer == null)
+            {
+                return NotFound();
+            }
+
+            var customerToPatch = Mapper.Map<CustomerUpdateDto>(existingCustomer);
+            customerPatchDoc.ApplyTo(customerToPatch);
+
+            Mapper.Map(customerToPatch, existingCustomer);
+            _customerRepository.Update(existingCustomer);
+
+            bool result = _customerRepository.Save();
+
+            if (!result)
+            {
+                return new StatusCodeResult(500);
+            }
+
+            return Ok(Mapper.Map<CustomerDto>(existingCustomer));
+
+        }
+
         
     }
 }
