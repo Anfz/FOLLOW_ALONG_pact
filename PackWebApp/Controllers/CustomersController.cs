@@ -124,6 +124,29 @@ namespace PackWebApp.Controllers
 
         }
 
+        [HttpDelete]
+        [Route("{id}")]
+        public IActionResult Delete(Guid id)
+        {
+            var existingCustomer = _customerRepository.GetSingle(id);
+
+            if (existingCustomer == null)
+            {
+                return NotFound();
+            }
+
+            _customerRepository.Delete(id);
+
+            bool result = _customerRepository.Save();
+
+            if (!result)
+            {
+                return new StatusCodeResult(500);
+            }
+
+            return NoContent();
+        }
+
         
     }
 }
