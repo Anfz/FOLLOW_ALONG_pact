@@ -31,6 +31,20 @@ namespace PackWebApp.Controllers
             return Ok(allCustomersDto);
         }
 
+        [HttpGet]
+        [Route("{id}")]
+        public IActionResult GetSingleCustomer(Guid id)
+        {
+            Customer customerFromRepo = _customerRepository.GetSingle(id);
+
+            if (customerFromRepo == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(customerFromRepo);
+
+        }
         
     }
 }

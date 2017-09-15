@@ -15,6 +15,8 @@ using PackWebApp.Dtos;
 using PackWebApp.Entities;
 using PackWebApp.Middlewares;
 using PackWebApp.Repositories;
+using PackWebApp.Services;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace PackWebApp
 {
@@ -49,12 +51,17 @@ namespace PackWebApp
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             //because we only need one
             services.AddScoped<ICustomerRepository, CustomerRepository>();
-
-            services.Configure<MyConfiguration>(Configuration);
             services.AddScoped<ISeedDataService, SeedDataService>();
 
+            services.Configure<MyConfiguration>(Configuration);
 
             services.AddMvc();
+
+
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Info { Title = "My API", Version = "v1" });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -78,7 +85,14 @@ namespace PackWebApp
 
             app.UseCustomMiddleware();
 
-            app.AddSeedData();
+            //app.AddSeedData();
+            app.UseSwagger();
+
+            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), specifying the Swagger JSON endpoint.
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+            });
 
             app.UseMvc(); 
         }

@@ -7,7 +7,7 @@ using SQLitePCL;
 
 namespace PackWebApp.Services
 {
-    public class SeedDataService
+    public class SeedDataService : ISeedDataService
     {
         private readonly PackDbContext _context;
 
@@ -22,11 +22,13 @@ namespace PackWebApp.Services
             _context.Customers.RemoveRange(_context.Customers);
             _context.SaveChanges();
 
-            Customer customer = new Customer();
-            customer.Firstname = "Chris";
-            customer.Lastname = "Beaver";
-            customer.Age = 30;
-            customer.Id = Guid.NewGuid();
+            Customer customer = new Customer
+            {
+                Firstname = "Chris",
+                Lastname = "Beaver",
+                Age = 30,
+                Id = Guid.NewGuid()
+            };
 
             _context.Add(customer);
 
