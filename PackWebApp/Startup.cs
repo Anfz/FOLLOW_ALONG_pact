@@ -81,6 +81,7 @@ namespace PackWebApp
             AutoMapper.Mapper.Initialize(mapper =>
             {
                 mapper.CreateMap<Customer, CustomerDto>().ReverseMap();
+                mapper.CreateMap<Customer, CustomerCreateDto>().ReverseMap();
             });
 
             app.UseCustomMiddleware();

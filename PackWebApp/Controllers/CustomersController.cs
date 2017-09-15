@@ -45,6 +45,23 @@ namespace PackWebApp.Controllers
             return Ok(customerFromRepo);
 
         }
+
+        [HttpPost]
+        public IActionResult AddCustomer(CustomerCreateDto customerCreateDto)
+        {
+            Customer toAdd = Mapper.Map<Customer>(customerCreateDto);
+
+            _customerRepository.Add(toAdd);
+
+            bool result = _customerRepository.Save();
+
+            if (!result)
+            {
+                return new StatusCodeResult(500);
+            }
+
+            return Ok(Mapper.Map<CustomerDto>(toAdd));
+        }
         
     }
 }
