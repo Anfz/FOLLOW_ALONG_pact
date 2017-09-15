@@ -51,6 +51,8 @@ namespace PackWebApp
             services.AddScoped<ICustomerRepository, CustomerRepository>();
 
             services.Configure<MyConfiguration>(Configuration);
+            services.AddScoped<ISeedDataService, SeedDataService>();
+
 
             services.AddMvc();
         }
@@ -75,6 +77,8 @@ namespace PackWebApp
             });
 
             app.UseCustomMiddleware();
+
+            app.AddSeedData();
 
             app.UseMvc(); 
         }

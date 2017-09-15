@@ -13,7 +13,7 @@ using PackWebApp.Repositories;
 namespace PackWebApp.Controllers
 {
     [Produces("application/json")]
-    [Route("api/customers")]
+    [Route("api/[controller]")]
     public class CustomersController : Controller
     {
         private ICustomerRepository _customerRepository;
