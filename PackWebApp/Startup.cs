@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using PackWebApp.Dtos;
 using PackWebApp.Entities;
 using PackWebApp.Middlewares;
 using PackWebApp.Repositories;
@@ -67,6 +68,11 @@ namespace PackWebApp
 
             app.UseDefaultFiles();
             app.UseStaticFiles();
+
+            AutoMapper.Mapper.Initialize(mapper =>
+            {
+                mapper.CreateMap<Customer, CustomerDto>().ReverseMap();
+            });
 
             app.UseCustomMiddleware();
 
