@@ -9,8 +9,10 @@ using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using PackWebApp.Dtos;
 using PackWebApp.Entities;
+using PackWebApp.QueryParameters;
 using PackWebApp.Repositories;
 
 namespace PackWebApp.Controllers
@@ -31,11 +33,14 @@ namespace PackWebApp.Controllers
 
         [HttpGet]
         [ProducesResponseType(typeof(List<Customer>), 200)]
-        public IActionResult GetAllCustomers()
+        public IActionResult GetAllCustomers(CustomerQueryParametrs customerQueryParametrs)
         {
             _logger.LogInformation("------> GetAllCustomers()");
-            var allCustomersDto = from customer in _customerRepository.GetAll().ToList()
+
+            var allCustomersDto = from customer in _customerRepository.GetAll(customerQueryParametrs).ToList()
                                select Mapper.Map<CustomerDto>(customer);
+
+            Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(new {totalCount = _customerRepository.Count()}));
             return Ok(allCustomersDto);
         }
 
