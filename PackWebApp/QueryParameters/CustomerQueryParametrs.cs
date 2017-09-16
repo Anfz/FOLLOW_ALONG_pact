@@ -8,9 +8,10 @@ namespace PackWebApp.QueryParameters
 {
     public class CustomerQueryParametrs
     {
-        private const int MaxPageCount = 100; 
+        private const int MaxPageCount = 100;
 
-        public int Page { get; set; }
+        private int _page = 1; 
+        public int Page { get => Math.Max(_page, 1); set => _page = value; }
 
         private int _pageCount = 100;
 

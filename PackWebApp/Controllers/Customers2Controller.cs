@@ -17,15 +17,15 @@ using PackWebApp.Repositories;
 
 namespace PackWebApp.Controllers
 {
-    [ApiVersion("1.0", Deprecated = true)]
+    [ApiVersion("2.0")]
     [Produces("application/json")]
-    [Route("api/[controller]")]
-    public class CustomersController : Controller
+    [Route("api/customers")]
+    public class Customers2Controller : Controller
     {
         private ICustomerRepository _customerRepository;
-        private readonly ILogger<CustomersController> _logger;
+        private readonly ILogger<Customers2Controller> _logger;
 
-        public CustomersController(ICustomerRepository customersRepository, ILogger<CustomersController> logger)
+        public Customers2Controller(ICustomerRepository customersRepository, ILogger<Customers2Controller> logger)
         {
             _customerRepository = customersRepository;
             _logger = logger; 
@@ -46,7 +46,7 @@ namespace PackWebApp.Controllers
         }
 
         [HttpGet]
-        [Route("{id}", Name="getSingleCustomer")]
+        [Route("{id}", Name="getSingleCustomer2")]
         public IActionResult GetSingleCustomer(Guid id)
         {
             Customer customerFromRepo = _customerRepository.GetSingle(id);
