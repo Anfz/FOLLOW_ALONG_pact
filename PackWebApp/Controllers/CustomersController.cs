@@ -30,6 +30,7 @@ namespace PackWebApp.Controllers
         }
 
         [HttpGet]
+        [ProducesResponseType(typeof(List<Customer>), 200)]
         public IActionResult GetAllCustomers()
         {
             _logger.LogInformation("------> GetAllCustomers()");
@@ -54,6 +55,8 @@ namespace PackWebApp.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(typeof(CustomerDto), 201)]
+        [ProducesResponseType(typeof(CustomerDto), 400)]
         public IActionResult AddCustomer([FromBody]CustomerCreateDto customerCreateDto)
         {
 
