@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using PackWebApp.Entities;
 using PackWebApp.QueryParameters;
 
@@ -33,19 +34,19 @@ namespace PackWebApp.Repositories
                 .Take(customerQueryParametrs.PageCount);
         }
 
-        public Customer GetSingle(Guid id)
+        public async Task<Customer> GetSingleAsync(Guid id)
         {
-            return _context.Customers.FirstOrDefault(x => x.Id == id);
+            return await _context.Customers.FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public void Add(Customer item)
+        public async void AddAsync(Customer item)
         {
-            _context.Customers.Add(item); 
+            await _context.Customers.AddAsync(item); 
         }
 
-        public void Delete(Guid id)
+        public async void DeleteAsync(Guid id)
         {
-            Customer customer = GetSingle(id);
+            Customer customer = await GetSingleAsync(id);
             _context.Customers.Remove(customer);
         }
 
@@ -54,14 +55,14 @@ namespace PackWebApp.Repositories
             _context.Customers.Update(item);
         }
 
-        public int Count()
+        public async Task<int> CountAsync()
         {
-            return _context.Customers.Count();
+            return await _context.Customers.CountAsync();
         }
 
-        public bool Save()
+        public async Task<bool> SaveAsync()
         {
-            return _context.SaveChanges() >= 0; 
+            return await _context.SaveChangesAsync() >= 0; 
         }
     }
 }

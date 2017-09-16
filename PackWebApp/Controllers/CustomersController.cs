@@ -41,7 +41,7 @@ namespace PackWebApp.Controllers
             var allCustomersDto = from customer in _customerRepository.GetAll(customerQueryParametrs).ToList()
                                select Mapper.Map<CustomerDto>(customer);
 
-            Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(new {totalCount = _customerRepository.Count()}));
+            Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(new {totalCount = _customerRepository.CountAsync().Result}));
             return Ok(allCustomersDto);
         }
 
@@ -49,7 +49,7 @@ namespace PackWebApp.Controllers
         [Route("{id}", Name="getSingleCustomer")]
         public IActionResult GetSingleCustomer(Guid id)
         {
-            Customer customerFromRepo = _customerRepository.GetSingle(id);
+            Customer customerFromRepo = _customerRepository.GetSingleAsync(id).Result;
 
             if (customerFromRepo == null)
             {
@@ -78,9 +78,9 @@ namespace PackWebApp.Controllers
 
             Customer toAdd = Mapper.Map<Customer>(customerCreateDto);
 
-            _customerRepository.Add(toAdd);
+            _customerRepository.AddAsync(toAdd);
 
-            bool result = _customerRepository.Save();
+            bool result = _customerRepository.SaveAsync().Result;
 
             if (!result)
             {
@@ -102,7 +102,7 @@ namespace PackWebApp.Controllers
                 return BadRequest(); 
             }
 
-            var existingCustomer = _customerRepository.GetSingle(id);
+            var existingCustomer = _customerRepository.GetSingleAsync(id).Result;
             if (existingCustomer == null)
             {
                 return NotFound();
@@ -119,7 +119,7 @@ namespace PackWebApp.Controllers
 
             _customerRepository.Update(existingCustomer);
 
-            bool result = _customerRepository.Save();
+            bool result = _customerRepository.SaveAsync().Result;
 
             if (!result)
             {
@@ -139,7 +139,7 @@ namespace PackWebApp.Controllers
                 return BadRequest(); 
             }
 
-            var existingCustomer = _customerRepository.GetSingle(id);
+            var existingCustomer = _customerRepository.GetSingleAsync(id).Result;
 
             if (existingCustomer == null)
             {
@@ -159,7 +159,7 @@ namespace PackWebApp.Controllers
             Mapper.Map(customerToPatch, existingCustomer);
             _customerRepository.Update(existingCustomer);
 
-            bool result = _customerRepository.Save();
+            bool result = _customerRepository.SaveAsync().Result;
 
             if (!result)
             {
@@ -174,16 +174,16 @@ namespace PackWebApp.Controllers
         [Route("{id}")]
         public IActionResult Delete(Guid id)
         {
-            var existingCustomer = _customerRepository.GetSingle(id);
+            var existingCustomer = _customerRepository.GetSingleAsync(id);
 
             if (existingCustomer == null)
             {
                 return NotFound();
             }
 
-            _customerRepository.Delete(id);
+            _customerRepository.DeleteAsync(id);
 
-            bool result = _customerRepository.Save();
+            bool result = _customerRepository.SaveAsync().Result;
 
             if (!result)
             {

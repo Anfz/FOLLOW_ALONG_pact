@@ -6,3 +6,9 @@ services:
     build:
       context: ./PackWebApp
       dockerfile: Dockerfile
+
+  securityservice:
+    image: securityservice
+    build:
+      context: ./../SecurityService
+      dockerfile: Dockerfile

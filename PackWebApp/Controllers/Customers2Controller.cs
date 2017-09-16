@@ -41,15 +41,15 @@ namespace PackWebApp.Controllers
             var allCustomersDto = from customer in _customerRepository.GetAll(customerQueryParametrs).ToList()
                                select Mapper.Map<CustomerDto>(customer);
 
-            Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(new {totalCount = _customerRepository.Count()}));
+            Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(new {totalCount = _customerRepository.CountAsync().Result}));
             return Ok(allCustomersDto);
         }
 
         [HttpGet]
         [Route("{id}", Name="getSingleCustomer2")]
-        public IActionResult GetSingleCustomer(Guid id)
+        public async Task<IActionResult> GetSingleCustomerAsync(Guid id)
         {
-            Customer customerFromRepo = _customerRepository.GetSingle(id);
+            Customer customerFromRepo = await _customerRepository.GetSingleAsync(id);
 
             if (customerFromRepo == null)
             {
@@ -63,7 +63,7 @@ namespace PackWebApp.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(CustomerDto), 201)]
         [ProducesResponseType(typeof(CustomerDto), 400)]
-        public IActionResult AddCustomer([FromBody]CustomerCreateDto customerCreateDto)
+        public async Task<IActionResult> AddCustomerAsync([FromBody]CustomerCreateDto customerCreateDto)
         {
 
             if (customerCreateDto == null)
@@ -78,9 +78,9 @@ namespace PackWebApp.Controllers
 
             Customer toAdd = Mapper.Map<Customer>(customerCreateDto);
 
-            _customerRepository.Add(toAdd);
+            _customerRepository.AddAsync(toAdd);
 
-            bool result = _customerRepository.Save();
+            bool result = await _customerRepository.SaveAsync();
 
             if (!result)
             {
@@ -94,7 +94,7 @@ namespace PackWebApp.Controllers
 
         [HttpPut]
         [Route("{id}")]
-        public IActionResult UpdateCustomer(Guid id, [FromBody] CustomerUpdateDto customerUpdateDto)
+        public async Task<IActionResult> UpdateCustomerAsync(Guid id, [FromBody] CustomerUpdateDto customerUpdateDto)
         {
 
             if (customerUpdateDto == null)
@@ -102,7 +102,7 @@ namespace PackWebApp.Controllers
                 return BadRequest(); 
             }
 
-            var existingCustomer = _customerRepository.GetSingle(id);
+            var existingCustomer = await _customerRepository.GetSingleAsync(id);
             if (existingCustomer == null)
             {
                 return NotFound();
@@ -119,7 +119,7 @@ namespace PackWebApp.Controllers
 
             _customerRepository.Update(existingCustomer);
 
-            bool result = _customerRepository.Save();
+            bool result = await _customerRepository.SaveAsync();
 
             if (!result)
             {
@@ -132,14 +132,14 @@ namespace PackWebApp.Controllers
 
         [HttpPatch]
         [Route("{id}")]
-        public IActionResult PartiallyUpdate(Guid id, [FromBody]JsonPatchDocument<CustomerUpdateDto> customerPatchDoc)
+        public async Task<IActionResult> PartiallyUpdateAsync(Guid id, [FromBody]JsonPatchDocument<CustomerUpdateDto> customerPatchDoc)
         {
             if (customerPatchDoc == null)
             {
                 return BadRequest(); 
             }
 
-            var existingCustomer = _customerRepository.GetSingle(id);
+            Customer existingCustomer = await _customerRepository.GetSingleAsync(id);
 
             if (existingCustomer == null)
             {
@@ -153,13 +153,14 @@ namespace PackWebApp.Controllers
 
             if (!ModelState.IsValid)
             {
-                BadRequest(ModelState);
+              return BadRequest(ModelState);
             }
 
             Mapper.Map(customerToPatch, existingCustomer);
+
             _customerRepository.Update(existingCustomer);
 
-            bool result = _customerRepository.Save();
+            bool result = await _customerRepository.SaveAsync();
 
             if (!result)
             {
@@ -172,18 +173,18 @@ namespace PackWebApp.Controllers
 
         [HttpDelete]
         [Route("{id}")]
-        public IActionResult Delete(Guid id)
+        public async Task<IActionResult> DeleteAsync(Guid id)
         {
-            var existingCustomer = _customerRepository.GetSingle(id);
+            var existingCustomer = _customerRepository.GetSingleAsync(id);
 
             if (existingCustomer == null)
             {
                 return NotFound();
             }
 
-            _customerRepository.Delete(id);
+            _customerRepository.DeleteAsync(id);
 
-            bool result = _customerRepository.Save();
+            bool result = await _customerRepository.SaveAsync();
 
             if (!result)
             {
