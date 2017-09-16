@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Formatters;
@@ -12,6 +13,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using NLog.Extensions.Logging;
+using NLog.Web;
 using PackWebApp.Dtos;
 using PackWebApp.Entities;
 using PackWebApp.Middlewares;
@@ -36,7 +39,9 @@ namespace PackWebApp
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json");
+                .AddJsonFile("appsettings.json")
+                .AddEnvironmentVariables();
+            env.ConfigureNLog("nlog.config");
             Configuration = builder.Build(); 
 
             Debug.WriteLine($" ---> From Config: {Configuration["firstname"]}");
@@ -76,10 +81,33 @@ namespace PackWebApp
             loggerFactory.AddConsole();
             loggerFactory.AddDebug();
 
+            loggerFactory.AddNLog();
+
+            //loggerFactory.AddNLogWeb();
+
 
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                app.UseExceptionHandler(errorApp =>
+                {
+                    errorApp.Run(async context =>
+                    {
+                        context.Response.StatusCode = 500;
+                        context.Response.ContentType = "text/plain";
+                        var errorFeature = context.Features.Get<IExceptionHandlerFeature>();
+                        if (errorFeature != null)
+                        {
+                            var logger = loggerFactory.CreateLogger("Global exception logger");
+                            logger.LogError(500, errorFeature.Error, errorFeature.Error.Message);
+                        }
+
+                        await context.Response.WriteAsync("There was an error");
+                    });
+                });
             }
 
             app.UseDefaultFiles();
