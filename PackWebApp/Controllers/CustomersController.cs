@@ -56,6 +56,17 @@ namespace PackWebApp.Controllers
         [HttpPost]
         public IActionResult AddCustomer([FromBody]CustomerCreateDto customerCreateDto)
         {
+
+            if (customerCreateDto == null)
+            {
+                return BadRequest("Please supplier customer details");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             Customer toAdd = Mapper.Map<Customer>(customerCreateDto);
 
             _customerRepository.Add(toAdd);
