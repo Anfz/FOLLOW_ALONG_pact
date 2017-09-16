@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -55,7 +56,12 @@ namespace PackWebApp
 
             services.Configure<MyConfiguration>(Configuration);
 
-            services.AddMvc();
+            services.AddMvc(config =>
+            {
+                config.ReturnHttpNotAcceptable = true;
+                config.OutputFormatters.Add(new XmlSerializerOutputFormatter());
+                config.InputFormatters.Add(new XmlSerializerInputFormatter());
+            });
 
 
             services.AddSwaggerGen(c =>
@@ -68,6 +74,7 @@ namespace PackWebApp
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             loggerFactory.AddConsole();
+            loggerFactory.AddDebug();
 
 
             if (env.IsDevelopment())

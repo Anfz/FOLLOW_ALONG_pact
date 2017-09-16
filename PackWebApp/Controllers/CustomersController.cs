@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using PackWebApp.Dtos;
 using PackWebApp.Entities;
 using PackWebApp.Repositories;
@@ -18,15 +19,19 @@ namespace PackWebApp.Controllers
     public class CustomersController : Controller
     {
         private ICustomerRepository _customerRepository;
+        private readonly ILogger<CustomersController> _logger;
 
-        public CustomersController(ICustomerRepository customersRepository)
+        public CustomersController(ICustomerRepository customersRepository, ILogger<CustomersController> logger)
         {
             _customerRepository = customersRepository;
+            _logger = logger; 
+            _logger.LogInformation("customers controller started");
         }
 
         [HttpGet]
         public IActionResult GetAllCustomers()
         {
+            _logger.LogInformation("------> GetAllCustomers()");
             var allCustomersDto = from customer in _customerRepository.GetAll().ToList()
                                select Mapper.Map<CustomerDto>(customer);
             return Ok(allCustomersDto);
