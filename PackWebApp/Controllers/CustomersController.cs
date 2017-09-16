@@ -87,13 +87,26 @@ namespace PackWebApp.Controllers
         [Route("{id}")]
         public IActionResult UpdateCustomer(Guid id, [FromBody] CustomerUpdateDto customerUpdateDto)
         {
+
+            if (customerUpdateDto == null)
+            {
+                return BadRequest(); 
+            }
+
             var existingCustomer = _customerRepository.GetSingle(id);
             if (existingCustomer == null)
             {
                 return NotFound();
             }
 
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+
             Mapper.Map(customerUpdateDto, existingCustomer);
+
 
             _customerRepository.Update(existingCustomer);
 
@@ -125,7 +138,14 @@ namespace PackWebApp.Controllers
             }
 
             var customerToPatch = Mapper.Map<CustomerUpdateDto>(existingCustomer);
-            customerPatchDoc.ApplyTo(customerToPatch);
+            customerPatchDoc.ApplyTo(customerToPatch, ModelState);
+
+            TryValidateModel(customerToPatch);
+
+            if (!ModelState.IsValid)
+            {
+                BadRequest(ModelState);
+            }
 
             Mapper.Map(customerToPatch, existingCustomer);
             _customerRepository.Update(existingCustomer);
